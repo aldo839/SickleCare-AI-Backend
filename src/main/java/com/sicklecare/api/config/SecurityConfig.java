@@ -27,6 +27,7 @@ public class SecurityConfig {
                                         authorize
                                                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/patients/register").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/auth/activation").permitAll()
                                                 .anyRequest().authenticated()
                         ).build();
     }
