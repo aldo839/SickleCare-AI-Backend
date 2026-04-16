@@ -6,17 +6,22 @@ import com.sicklecare.api.dtos.PatientUpdateDTO;
 import com.sicklecare.api.exceptions.ResourceNotFoundException;
 import com.sicklecare.api.exceptions.UserAlreadyExistsException;
 import com.sicklecare.api.models.Patient;
+import com.sicklecare.api.models.PatientValidation;
 import com.sicklecare.api.models.Role;
+import com.sicklecare.api.models.User;
 import com.sicklecare.api.repository.PatientRepository;
 import com.sicklecare.api.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.CloseableThreadContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +66,7 @@ public class PatientService {
         patient.setCity(dto.getCity());
 
         patient.setRole(Role.PATIENT);
-        patient.setActive(true);
+        patient.setActivated(false);
         patient.setValidated(false);
 
         // Save patient
@@ -128,7 +133,24 @@ public class PatientService {
 
     // Delete patient
     public void deletePatient(Long id){
+
         patientRepository.deleteById(id);
+    }
+
+    // Activate a patient account
+    public void activatePatient(Map<String, String> activation){
+
+        String code = activation.get("code");
+
+        PatientValidation validation = patientValidationService.readCode(code);
+
+        if (Instant.now().isAfter(validation.getExpiration())){
+            throw new RuntimeException("Time expired");
+        }
+
+        User user = validation.getUser();
+        user.setActivated(true);
+        userRepository.save(user);
     }
 
 }
