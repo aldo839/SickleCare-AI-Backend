@@ -24,8 +24,8 @@ public class User implements UserDetailsService {
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private Boolean active = false; // For account state
-    private Boolean validated = false; // For account validation
+    private Boolean activated = false; // For account activation by user
+    private Boolean validated = false; // For account state if it is validated by admin or not
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
