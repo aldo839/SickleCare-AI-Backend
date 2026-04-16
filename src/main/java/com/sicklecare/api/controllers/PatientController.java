@@ -3,7 +3,6 @@ package com.sicklecare.api.controllers;
 import com.sicklecare.api.dtos.PatientRegistrationDTO;
 import com.sicklecare.api.dtos.PatientResponseDTO;
 import com.sicklecare.api.dtos.PatientUpdateDTO;
-import com.sicklecare.api.models.Patient;
 import com.sicklecare.api.repository.PatientRepository;
 import com.sicklecare.api.services.PatientService;
 import jakarta.mail.MessagingException;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -43,6 +43,13 @@ public class PatientController {
     public ResponseEntity<PatientResponseDTO> registerPatient(@Valid @RequestBody PatientRegistrationDTO patientRegistrationDTO) throws MessagingException, UnsupportedEncodingException {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(patientService.registerPatient(patientRegistrationDTO));
+    }
+
+    @PostMapping("/activation")
+    public ResponseEntity<String> activation(@RequestBody Map<String, String> activation) {
+
+        patientService.activatePatient(activation);
+        return ResponseEntity.ok("Your account is enable !");
     }
 
     @PutMapping("/{id}")
