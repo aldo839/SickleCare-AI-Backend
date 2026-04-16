@@ -22,7 +22,7 @@ public class NotificationService {
             message.setSubject("Your activation code");
 
             String text = String.format(
-                    "Hello %s, \nyour activation code is %s; See you soon",
+                    "Hello %s, \nyour activation code is %s. \nSee you soon",
                     patientValidation.getUser().getUsername(),
                     patientValidation.getCode()
             );
@@ -30,12 +30,10 @@ public class NotificationService {
 
             javaMailSender.send(message);
         } catch (MailException e) {
-            System.out.println("Error on mail sending process : " + e.getMessage());
-            System.out.println("CODE POUR TEST : " + patientValidation.getCode());
+            System.out.println("Error on email sending process : " + e.getMessage());
+            System.out.println("Test code : " + patientValidation.getCode());
         }
 
-
     }
-
 
 }
