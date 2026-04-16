@@ -14,7 +14,9 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
+!.idea/encodings.xml
+!.idea/compiler.xml
 *.iws
 *.iml
 *.ipr
@@ -31,3 +33,15 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# --- Security ---
+.env
+.env.local
+.env.*.local
+
+# --- Fichiers système ---
+.DS_Store
+Thumbs.db
+
+# --- Logs ---
+*.log
