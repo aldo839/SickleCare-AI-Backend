@@ -1,7 +1,5 @@
 package com.sicklecare.api.dtos;
 
-import java.time.LocalDate;
-
 public record PatientResponseDTO(
 
         Long id,
