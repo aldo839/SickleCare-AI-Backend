@@ -3,11 +3,8 @@ package com.sicklecare.api.services;
 import com.sicklecare.api.models.PatientValidation;
 import com.sicklecare.api.models.User;
 import com.sicklecare.api.repository.PatientValidationRepository;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
@@ -42,4 +39,10 @@ public class PatientValidationService{
         }
 
     }
+
+    public PatientValidation readCode(String code) {
+        return patientValidationRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException("Invalid code"));
+    }
+
 }
