@@ -1,5 +1,6 @@
 package com.sicklecare.api.services;
 
+import com.sicklecare.api.config.JwtUtils;
 import com.sicklecare.api.dtos.PatientRegistrationDTO;
 import com.sicklecare.api.dtos.PatientResponseDTO;
 import com.sicklecare.api.dtos.PatientUpdateDTO;
@@ -11,14 +12,10 @@ import com.sicklecare.api.models.Role;
 import com.sicklecare.api.models.User;
 import com.sicklecare.api.repository.PatientRepository;
 import com.sicklecare.api.repository.UserRepository;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.CloseableThreadContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +33,8 @@ public class PatientService {
     private final PasswordEncoder passwordEncoder;
 
     private final PatientValidationService patientValidationService;
+
+    private final JwtUtils jwtUtils;
 
     public PatientResponseDTO registerPatient(PatientRegistrationDTO dto) {
 
@@ -138,7 +137,7 @@ public class PatientService {
     }
 
     // Activate a patient account
-    public void activatePatient(Map<String, String> activation){
+    public String activatePatient(Map<String, String> activation){
 
         String code = activation.get("code");
 
@@ -151,6 +150,8 @@ public class PatientService {
         User user = validation.getUser();
         user.setActivated(true);
         userRepository.save(user);
+
+        return jwtUtils.generateToken(user);
     }
 
 }
