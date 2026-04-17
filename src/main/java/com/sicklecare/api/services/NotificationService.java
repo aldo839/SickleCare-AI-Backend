@@ -18,7 +18,7 @@ public class NotificationService {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("noreply@sicklecareai.ai");
-            message.setTo(patientValidation.getUser().getUsername());
+            message.setTo(patientValidation.getUser().getEmail());
             message.setSubject("Your activation code");
 
             String text = String.format(
