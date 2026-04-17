@@ -46,10 +46,16 @@ public class PatientController {
     }
 
     @PostMapping("/activation")
-    public ResponseEntity<String> activation(@RequestBody Map<String, String> activation) {
+    public ResponseEntity<Map<String, String>> activation(@RequestBody Map<String, String> activation) {
 
-        patientService.activatePatient(activation);
-        return ResponseEntity.ok("Your account is enable !");
+        String token = patientService.activatePatient(activation);
+
+        Map<String, String> response = Map.of(
+                "message", "Your account is enabled !",
+                "token", token
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
