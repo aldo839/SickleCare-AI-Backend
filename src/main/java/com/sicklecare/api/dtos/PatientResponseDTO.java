@@ -1,11 +1,13 @@
 package com.sicklecare.api.dtos;
 
+import com.sicklecare.api.models.Role;
+
 public record PatientResponseDTO(
 
         Long id,
         String username,
         String email,
-        String role,
+        Role role,
         String name,
         Boolean sex,
         Integer age,
