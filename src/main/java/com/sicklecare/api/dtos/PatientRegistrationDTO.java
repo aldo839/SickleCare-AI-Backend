@@ -22,17 +22,15 @@ public class PatientRegistrationDTO {
     @Size(min = 8, message = "Password will have 8 characters or more !")
     private String password;
 
-    private Role role;
-    private Boolean active = true;
-    private Boolean validated = false;
-
     private String firstname;
     private String lastname;
     private Boolean sex;
+
     @Past(message = "Birth date should be past !")
     private LocalDate birthDate;
     private String genotype;
     private String bloodType;
+
     @Positive(message = "Weight should be positive !")
     private Double weight;
     private String region;
