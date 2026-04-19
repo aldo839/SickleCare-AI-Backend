@@ -12,10 +12,11 @@ public class DoctorUpdateDTO {
     private String username;
     @Email(message = "Email will be valid !")
     private String email;
+    @Size(min = 8, message = "Password may have 8 characters or more !")
     private String password;
     private String hospitalUnit;
     private String region;
     private String city;
-    private Double hospital;
+    private String hospital;
 
 }
