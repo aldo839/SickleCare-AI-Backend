@@ -9,7 +9,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "validation")
+@Table(name = "patient_validation")
 public class PatientValidation {
 
     @Id
