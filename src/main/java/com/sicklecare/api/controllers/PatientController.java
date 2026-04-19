@@ -7,6 +7,7 @@ import com.sicklecare.api.repository.PatientRepository;
 import com.sicklecare.api.services.PatientService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/patients")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class PatientController {
 
-    @Autowired
-    private PatientService patientService;
-
-    @Autowired
-    private PatientRepository patientRepository;
+    private final PatientService patientService;
 
     @GetMapping
     public ResponseEntity<List<PatientResponseDTO>> getAllPatients() {
