@@ -25,15 +25,10 @@ import java.util.Map;
 public class PatientService {
 
     private final UserRepository userRepository;
-
     private final PatientRepository patientRepository;
-
     private final PatientMapperService patientMapperService;
-
     private final PasswordEncoder passwordEncoder;
-
     private final PatientValidationService patientValidationService;
-
     private final JwtUtils jwtUtils;
 
     public PatientResponseDTO registerPatient(PatientRegistrationDTO dto) {
