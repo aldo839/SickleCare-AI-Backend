@@ -20,7 +20,7 @@ public class PatientMapperService {
                 patient.getId(),
                 patient.getUsername(),
                 patient.getEmail(),
-                patient.getRole().name(),
+                patient.getRole(),
                 patient.getFirstname() + " " + patient.getLastname(),
                 patient.getSex(),
                 age,
