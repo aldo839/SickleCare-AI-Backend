@@ -61,6 +61,13 @@ public class DoctorService {
 
         Doctor savedDoctor = doctorRepository.save(doctor);
 
+        // validation
+        try {
+            doctorValidationService.save(savedDoctor);
+        } catch (Exception e) {
+            System.err.println("Validation error : " + e.getMessage());
+        }
+
         return doctorMapperService.mapToResponseDTO(savedDoctor);
 
     }
