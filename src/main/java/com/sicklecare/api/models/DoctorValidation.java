@@ -11,16 +11,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @Getter @Setter
 @Table(name = "doctor_validation")
-public class DoctorValidation {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Instant creation;
-    private Instant expiration;
-    private Instant validation;
-    private String code;
-    @OneToOne(cascade = CascadeType.ALL)
-    private User user;
+public class DoctorValidation extends Validation {
 
 }
