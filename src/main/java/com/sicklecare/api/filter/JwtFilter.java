@@ -2,6 +2,7 @@ package com.sicklecare.api.filter;
 
 import com.sicklecare.api.config.JwtUtils;
 import com.sicklecare.api.services.UserDetailsServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +34,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")){
             jwt = authHeader.substring(7);
-            username = jwtUtils.extractUsername(jwt);
+            try {
+                username = jwtUtils.extractUsername(jwt);
+            } catch (ExpiredJwtException e) {
+//                System.out.println("JWT not valid : " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Another JWT error : " + e.getMessage());
+            }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null){
