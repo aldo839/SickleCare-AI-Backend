@@ -1,6 +1,7 @@
 package com.sicklecare.api.services;
 
 import com.sicklecare.api.models.DoctorValidation;
+import com.sicklecare.api.models.PatientValidation;
 import com.sicklecare.api.models.User;
 import com.sicklecare.api.repository.DoctorValidationRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,4 +42,8 @@ public class DoctorValidationService {
 
     }
 
+    public DoctorValidation readCode(String code) {
+        return doctorValidationRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException("Invalid code"));
+    }
 }
