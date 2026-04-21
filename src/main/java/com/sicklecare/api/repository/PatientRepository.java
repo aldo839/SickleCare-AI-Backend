@@ -13,4 +13,8 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     List<Patient> findByCity(String city);
 
+    List<Patient> findByValidatedTrue(Boolean validated);
+
+    List<Patient> findByGenotype(String genotype);
+
 }

@@ -14,4 +14,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     List<Doctor> findByCity(String city);
 
     List<Doctor> findByHospital(String hospital);
+
+    List<Doctor> findByValidatedTrue(Boolean validated);
+
 }
