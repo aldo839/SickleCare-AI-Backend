@@ -23,7 +23,7 @@ public class DoctorController {
 
     private final DoctorService doctorService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<DoctorResponseDTO>> getAllDoctors() {
 
         return ResponseEntity.ok(doctorService.getAllDoctors());
