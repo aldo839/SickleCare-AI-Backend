@@ -21,9 +21,8 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("Error", "Not Found");
-        body.put("message", ex.getMessage());
-        body.put("path", request.getDescription(false));
+        body.put("error", "Resource Not Found");
+        body.put("message", "The requested item does not exist");
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
@@ -42,16 +41,11 @@ public class GlobalExceptionHandler {
     // To manage validation error
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex){
-        Map<String, Object> errors = new HashMap<>();
-
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), error.getDefaultMessage());
-        });
-
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", errors);
+        body.put("error", "Validation Failed");
+        body.put("details", "One or more fields are invalid. Please check your input.");
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
@@ -63,20 +57,18 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.UNAUTHORIZED.value());
         body.put("error", "Unauthorized");
-        body.put("message", ex.getMessage());
+        body.put("message", "Invalid email or password.");
 
         return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
-    // Dans GlobalExceptionHandler.java
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Object> handleUserAlreadyExists(UserAlreadyExistsException ex, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.CONFLICT.value()); // 409 Conflict
-        body.put("error", "User Conflict");
-        body.put("message", ex.getMessage());
-        body.put("path", request.getDescription(false));
+        body.put("error", "Registration Error");
+        body.put("message", "Unable to complete registration with the provided information.");
 
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
@@ -86,9 +78,8 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value()); // 400 Bad Request
-        body.put("error", "Invalid OTP");
-        body.put("message", ex.getMessage());
-        body.put("path", request.getDescription(false));
+        body.put("error", "Bad Request");
+        body.put("message", "The request could not be understood or contains invalid parameters.");
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
