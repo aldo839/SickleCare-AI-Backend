@@ -18,14 +18,14 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/patients")
+@RequestMapping("/api/patient")
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class PatientController {
 
     private final PatientService patientService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<PatientResponseDTO>> getAllPatients() {
 
         return ResponseEntity.ok(patientService.getAllPatients());
