@@ -7,8 +7,7 @@ public record AdminResponseDTO(
         Long id,
         String username,
         String email,
-        String firstname,
-        String lastname,
+        String name,
         Role role
 
 ) {
