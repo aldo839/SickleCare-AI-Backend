@@ -1,18 +1,14 @@
 package com.sicklecare.api.controllers;
 
-import com.sicklecare.api.dtos.DoctorRegistrationDTO;
 import com.sicklecare.api.dtos.DoctorResponseDTO;
 import com.sicklecare.api.dtos.DoctorUpdateDTO;
 import com.sicklecare.api.services.DoctorService;
-import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -34,12 +30,6 @@ public class DoctorController {
     public ResponseEntity<DoctorResponseDTO> getDoctorById(@PathVariable Long id) {
 
         return ResponseEntity.ok(doctorService.getDoctorByID(id));
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<DoctorResponseDTO> registerDoctor(@Valid @RequestBody DoctorRegistrationDTO doctorRegistrationDTO) throws MessagingException, UnsupportedEncodingException {
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(doctorService.registerDoctor(doctorRegistrationDTO));
     }
 
     @PostMapping("/activation")

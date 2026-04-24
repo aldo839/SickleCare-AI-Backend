@@ -38,12 +38,6 @@ public class PatientController {
         return ResponseEntity.ok(patientService.getPatientByID(id));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<PatientResponseDTO> registerPatient(@Valid @RequestBody PatientRegistrationDTO patientRegistrationDTO) throws MessagingException, UnsupportedEncodingException {
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(patientService.registerPatient(patientRegistrationDTO));
-    }
-
     @PostMapping("/activation")
     public ResponseEntity<Map<String, String>> activation(@RequestBody Map<String, String> activation) {
 
