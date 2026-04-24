@@ -1,8 +1,6 @@
 package com.sicklecare.api.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +17,8 @@ public class Patient extends User {
 
     private String firstname;
     private String lastname;
-    private Boolean sex;
+    @Enumerated(EnumType.STRING)
+    private PatientSex sex;
     @Column(name = "birth_date")
     @Past
     private LocalDate birthDate;

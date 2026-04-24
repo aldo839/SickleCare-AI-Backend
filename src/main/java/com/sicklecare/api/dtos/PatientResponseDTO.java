@@ -1,5 +1,6 @@
 package com.sicklecare.api.dtos;
 
+import com.sicklecare.api.models.PatientSex;
 import com.sicklecare.api.models.Role;
 
 public record PatientResponseDTO(
@@ -9,7 +10,7 @@ public record PatientResponseDTO(
         String email,
         Role role,
         String name,
-        Boolean sex,
+        PatientSex sex,
         Integer age,
         String genotype,
         String bloodType,

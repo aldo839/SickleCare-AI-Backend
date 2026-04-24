@@ -1,5 +1,6 @@
 package com.sicklecare.api.dtos;
 
+import com.sicklecare.api.models.PatientSex;
 import com.sicklecare.api.models.Role;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class PatientRegistrationDTO {
 
     private String firstname;
     private String lastname;
-    private Boolean sex;
+    private PatientSex sex;
 
     @Past(message = "Birth date should be past !")
     private LocalDate birthDate;
