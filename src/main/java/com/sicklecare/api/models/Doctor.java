@@ -1,6 +1,7 @@
 package com.sicklecare.api.models;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "doctors")
+@PrimaryKeyJoinColumn(name = "id")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 public class Doctor extends User {
