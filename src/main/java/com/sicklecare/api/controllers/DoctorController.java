@@ -64,4 +64,13 @@ public class DoctorController {
         return ResponseEntity.ok("Doctor deleted Successfully");
     }
 
+    @PatchMapping("/validate-doctor/{id}")
+    @PreAuthorize("hasAnyAuthority('ROOT', 'ADMIN')")
+    public ResponseEntity<Map<String, String>> validateDoctor(@PathVariable Long id){
+
+        doctorService.validateDoctor(id);
+
+        return ResponseEntity.ok(Map.of("message", "Doctor validated successfully !"));
+    }
+
 }
