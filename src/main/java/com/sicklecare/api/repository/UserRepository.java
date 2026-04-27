@@ -1,5 +1,6 @@
 package com.sicklecare.api.repository;
 
+import com.sicklecare.api.models.Role;
 import com.sicklecare.api.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,6 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
-    boolean existsByRole(String role);
+    boolean existsByRole(Role role);
 
 }
