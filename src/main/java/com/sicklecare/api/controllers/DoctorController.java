@@ -3,6 +3,7 @@ package com.sicklecare.api.controllers;
 import com.sicklecare.api.dtos.DoctorResponseDTO;
 import com.sicklecare.api.dtos.DoctorUpdateDTO;
 import com.sicklecare.api.services.DoctorService;
+import com.sicklecare.api.services.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +20,17 @@ import java.util.Map;
 public class DoctorController {
 
     private final DoctorService doctorService;
+    private final PatientService patientService;
 
     @GetMapping("/all")
+    @PreAuthorize("hasAnyAuthority('ROOT', 'ADMIN')")
     public ResponseEntity<List<DoctorResponseDTO>> getAllDoctors() {
 
-        return ResponseEntity.ok(doctorService.getAllDoctors());
+       return ResponseEntity.ok(doctorService.getAllDoctors());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated")
     public ResponseEntity<DoctorResponseDTO> getDoctorById(@PathVariable Long id) {
 
         return ResponseEntity.ok(doctorService.getDoctorByID(id));
@@ -46,13 +50,14 @@ public class DoctorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('DOCTOR') and #id == principal.id")
     public ResponseEntity<DoctorResponseDTO> updateDoctor(@PathVariable Long id, @Valid @RequestBody DoctorUpdateDTO doctorUpdateDTO){
 
         return ResponseEntity.ok(doctorService.updateDoctor(id, doctorUpdateDTO));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROOT', 'ADMIN')")
     public ResponseEntity<String> deleteDoctor(@PathVariable Long id){
 
         doctorService.deleteDoctor(id);
