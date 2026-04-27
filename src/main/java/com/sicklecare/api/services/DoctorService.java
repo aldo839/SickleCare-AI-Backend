@@ -12,6 +12,7 @@ import com.sicklecare.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -27,6 +28,7 @@ public class DoctorService {
     private final DoctorValidationService doctorValidationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final NotificationService notificationService;
 
     public DoctorResponseDTO registerDoctor(DoctorRegistrationDTO dto){
 
@@ -147,6 +149,21 @@ public class DoctorService {
         userRepository.save(user);
 
         return jwtUtils.generateToken(user);
+    }
+
+    // Validate doctor by admin
+    @Transactional
+    public void validateDoctor(Long doctorId){
+
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found !"));
+
+        doctor.setValidated(true);
+        doctorRepository.save(doctor);
+
+        // Successfully validation Email
+        notificationService.sendAdminValidationSuccess(doctor);
+
     }
 
 }
