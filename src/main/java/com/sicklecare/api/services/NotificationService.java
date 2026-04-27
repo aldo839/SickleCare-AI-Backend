@@ -1,7 +1,6 @@
 package com.sicklecare.api.services;
 
-import com.sicklecare.api.models.DoctorValidation;
-import com.sicklecare.api.models.PatientValidation;
+import com.sicklecare.api.models.Role;
 import com.sicklecare.api.models.User;
 import com.sicklecare.api.models.Validation;
 import lombok.AllArgsConstructor;
@@ -45,6 +44,24 @@ public class NotificationService {
             message.setFrom("noreply@sicklecareai.ai");
             message.setTo(user.getEmail());
             message.setSubject("Account Validated - SickleCare");
+
+            if (user.getRole() == Role.DOCTOR) {
+                message.setSubject("SickleCare Doctor Account Validation");
+                String text = String.format(
+                        "Hello %s, \nYour account has been officially validated by our administration. " +
+                                "You can now access all features of SickleCare AI." +
+                                "\n You can now be selected by patients on the App !",
+                        user.getUsername()
+                );
+            } else {
+                message.setSubject("SickleCare Patient Account Validation");
+                String text = String.format(
+                        "Hello %s, \nYour account has been officially validated by our administration. " +
+                                "You can now access all features of SickleCare AI." +
+                                "\n See you on the App to select your doctor !",
+                        user.getUsername()
+                );
+            }
 
             String text = String.format(
                     "Hello %s, \nYour account has been officially validated by our administration. " +
