@@ -7,11 +7,13 @@ import com.sicklecare.api.dtos.PatientUpdateDTO;
 import com.sicklecare.api.exceptions.ResourceNotFoundException;
 import com.sicklecare.api.exceptions.UserAlreadyExistsException;
 import com.sicklecare.api.models.*;
+import com.sicklecare.api.repository.DoctorRepository;
 import com.sicklecare.api.repository.PatientRepository;
 import com.sicklecare.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -23,10 +25,12 @@ public class PatientService {
 
     private final UserRepository userRepository;
     private final PatientRepository patientRepository;
+    private final DoctorRepository doctorRepository;
     private final PatientMapperService patientMapperService;
     private final PasswordEncoder passwordEncoder;
     private final PatientValidationService patientValidationService;
     private final JwtUtils jwtUtils;
+    private final NotificationService notificationService;
 
     public PatientResponseDTO registerPatient(PatientRegistrationDTO dto) {
 
@@ -157,6 +161,37 @@ public class PatientService {
     public Boolean isPatientAssignedToDoctor(Long patientId, Long doctorId){
 
         return patientRepository.existsByIdAndDoctorId(patientId, doctorId);
+    }
+
+    // Select Doctor for patient
+    public void selectPatientDoctor(Long patientId, Long doctorId){
+
+        // Check if Patient and Doctor exists
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found !"));
+
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found !"));
+
+        patient.setDoctor(doctor);
+
+        patientRepository.save(patient);
+
+    }
+
+    // Validate patient by admin
+    @Transactional
+    public void validatePatient(Long patientId){
+
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found !"));
+
+        patient.setValidated(true);
+        patientRepository.save(patient);
+
+        // Successfully validation Email
+        notificationService.sendAdminValidationSuccess(patient);
+
     }
 
 }
