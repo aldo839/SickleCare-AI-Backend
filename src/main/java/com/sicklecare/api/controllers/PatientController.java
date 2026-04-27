@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -71,6 +70,24 @@ public class PatientController {
 
         Long doctorId = connectedUser.getId();
         return ResponseEntity.ok(patientService.getPatientsByDoctor(doctorId));
+    }
+
+    @GetMapping("/select-doctor/{doctorId}")
+    @PreAuthorize("hasAuthority('PATIENT')")
+    public ResponseEntity<Map<String, String>> selectDoctor(@PathVariable Long doctorId, @AuthenticationPrincipal User connectedUser){
+
+        patientService.selectPatientDoctor(connectedUser.getId(), doctorId);
+
+        return ResponseEntity.ok(Map.of("message", "Doctor successfully selected !"));
+    }
+
+    @PatchMapping("/validate-patient/{id}")
+    @PreAuthorize("hasAnyAuthority('ROOT', 'ADMIN')")
+    public ResponseEntity<Map<String, String>> validatePatient(@PathVariable Long id){
+
+        patientService.validatePatient(id);
+
+        return ResponseEntity.ok(Map.of("message", "Patient validated successfully !"));
     }
 
 }
