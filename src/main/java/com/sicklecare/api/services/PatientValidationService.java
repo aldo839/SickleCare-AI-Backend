@@ -33,7 +33,7 @@ public class PatientValidationService{
         patientValidationRepository.save(patientValidation);
 
         try {
-            notificationService.send(patientValidation);
+            notificationService.sendActivationCode(patientValidation);
         } catch (Exception e) {
             System.err.println("Problem to send email : " + e.getMessage());
         }

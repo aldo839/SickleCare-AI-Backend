@@ -35,7 +35,7 @@ public class DoctorValidationService {
         doctorValidationRepository.save(doctorValidation);
 
         try {
-            notificationService.send(doctorValidation);
+            notificationService.sendActivationCode(doctorValidation);
         } catch (Exception e) {
             System.out.println("Problem to send email : " + e.getMessage());
         }
