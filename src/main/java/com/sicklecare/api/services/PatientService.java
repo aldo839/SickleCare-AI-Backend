@@ -6,10 +6,7 @@ import com.sicklecare.api.dtos.PatientResponseDTO;
 import com.sicklecare.api.dtos.PatientUpdateDTO;
 import com.sicklecare.api.exceptions.ResourceNotFoundException;
 import com.sicklecare.api.exceptions.UserAlreadyExistsException;
-import com.sicklecare.api.models.Patient;
-import com.sicklecare.api.models.PatientValidation;
-import com.sicklecare.api.models.Role;
-import com.sicklecare.api.models.User;
+import com.sicklecare.api.models.*;
 import com.sicklecare.api.repository.PatientRepository;
 import com.sicklecare.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +73,24 @@ public class PatientService {
         return patientMapperService.mapToResponseDTO(savedPatient);
     }
 
+    // Activate a patient account using activation code
+    public String activatePatient(Map<String, String> activation){
+
+        String code = activation.get("code");
+
+        PatientValidation validation = patientValidationService.readCode(code);
+
+        if (Instant.now().isAfter(validation.getExpiration())){
+            throw new RuntimeException("Time expired");
+        }
+
+        User user = validation.getUser();
+        user.setActivated(true);
+        userRepository.save(user);
+
+        return jwtUtils.generateToken(user);
+    }
+
     // Fetch all patient
     public List<PatientResponseDTO> getAllPatients(){
 
@@ -122,7 +137,6 @@ public class PatientService {
 
         Patient updatePatient = patientRepository.save(patient);
         return patientMapperService.mapToResponseDTO(updatePatient);
-
     }
 
     // Delete patient
@@ -131,22 +145,18 @@ public class PatientService {
         patientRepository.deleteById(id);
     }
 
-    // Activate a patient account
-    public String activatePatient(Map<String, String> activation){
+    // Fetch patients by DoctorId
+    public List<PatientResponseDTO> getPatientsByDoctor(Long doctorId){
 
-        String code = activation.get("code");
+        return patientRepository.findByDoctorId(doctorId)
+                .stream()
+                .map(patientMapperService::mapToResponseDTO)
+                .toList();
+    }
 
-        PatientValidation validation = patientValidationService.readCode(code);
+    public Boolean isPatientAssignedToDoctor(Long patientId, Long doctorId){
 
-        if (Instant.now().isAfter(validation.getExpiration())){
-            throw new RuntimeException("Time expired");
-        }
-
-        User user = validation.getUser();
-        user.setActivated(true);
-        userRepository.save(user);
-
-        return jwtUtils.generateToken(user);
+        return patientRepository.existsByIdAndDoctorId(patientId, doctorId);
     }
 
 }
