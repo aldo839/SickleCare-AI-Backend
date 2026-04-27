@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "patients")
 @Getter @Setter
+@PrimaryKeyJoinColumn(name = "id")
 @NoArgsConstructor @AllArgsConstructor
 public class Patient extends User {
 
@@ -28,5 +29,8 @@ public class Patient extends User {
     private Double weight;
     private String region;
     private String city;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "doctor_id")
+    private Doctor doctor;
 
 }
