@@ -40,7 +40,7 @@ public class AdminService {
     @Transactional(rollbackFor = Exception.class)
     public void initRootAccount(){
 
-        if (!userRepository.existsByRole(Role.ROOT.name())){
+        if (!userRepository.existsByRole(Role.ROOT)) {
 
             Admin root = new Admin();
             root.setUsername(rootUsername);
