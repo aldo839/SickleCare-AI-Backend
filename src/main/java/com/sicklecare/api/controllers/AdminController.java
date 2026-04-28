@@ -19,34 +19,35 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/all")
-    @PreAuthorize("hasAnyRole('ROOT', 'ADMIN')")
+    @PreAuthorize("hasAuthority('ROOT')")
     public ResponseEntity<List<AdminResponseDTO>> getAllAdmin() {
         return ResponseEntity.ok(adminService.getAllAdmin());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROOT', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROOT', 'ADMIN')")
     public ResponseEntity<AdminResponseDTO> getAdminById(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.getAdminByID(id));
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasRole('ROOT')")
+    @PreAuthorize("hasAuthority('ROOT')")
     public ResponseEntity<AdminResponseDTO> registerAdmin(@Valid @RequestBody AdminRegistrationDTO adminRegistrationDTO) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(adminService.createAdmin(adminRegistrationDTO));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROOT')")
+    @PreAuthorize("hasAuthority('ROOT') or (hasAuthority('ADMIN') and #id == principal.id)")
     public ResponseEntity<AdminResponseDTO> updateAdmin(@PathVariable Long id, @Valid @RequestBody AdminUpdateDTO adminUpdateDTO){
         return ResponseEntity.ok(adminService.updateAdmin(id, adminUpdateDTO));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROOT')")
+    @PreAuthorize("hasAuthority('ROOT')")
     public ResponseEntity<String> deleteAdmin(@PathVariable Long id){
         adminService.deleteAdmin(id);
         return ResponseEntity.ok("Admin deleted successfully");
     }
+
 }
