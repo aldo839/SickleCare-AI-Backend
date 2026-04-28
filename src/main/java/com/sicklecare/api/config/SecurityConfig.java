@@ -5,9 +5,7 @@ import com.sicklecare.api.services.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -36,15 +34,19 @@ public class SecurityConfig {
                                 authorize ->
                                         authorize
 
-                                                .requestMatchers("/api/patients/register", "/api/patients/activation").permitAll()
-                                                .requestMatchers("/api/doctor/register", "/api/doctor/activation").permitAll()
+                                                .requestMatchers("/api/auth/**", "/oauth2/**").permitAll()
+                                                .requestMatchers("/api/patients/activation").permitAll()
+                                                .requestMatchers("/api/doctor/activation").permitAll()
                                                 .requestMatchers("/api/patient/all").hasRole("ADMIN")
-                                                .requestMatchers("/api/doctor/all").hasAnyRole("ADMIN", "PATIENT")
-                                                .requestMatchers("/api/auth/**").permitAll()
+                                                .requestMatchers("/api/doctor/all").hasAnyRole("ADMIN", "ROOT")
+                                                .requestMatchers("/api/admin/all", "/api/admin/register").hasRole("ROOT")
                                                 .anyRequest().authenticated()
                         )
                         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                        .oauth2Login(oauth2 -> oauth2
+                                .defaultSuccessUrl("/api/auth/oauth2-success", true))
+                        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                         .build();
     }
 
@@ -57,10 +59,8 @@ public class SecurityConfig {
 
     // To manage JWT
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity httpSecurity, PasswordEncoder passwordEncoder) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
-        return authenticationManagerBuilder.build();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
 }
