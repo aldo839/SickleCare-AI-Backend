@@ -77,4 +77,18 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+
+    // configuration of TTL(Time To Live) of redis
+    public Long getRemainingExperiationTime(String token) {
+
+        try {
+            Date expiration = extractExpiration(token);
+            long diff = expiration.getTime() - System.currentTimeMillis();
+            return diff > 0 ? diff : 0;
+
+        } catch (Exception e) {
+            return 0L;
+        }
+    }
+
 }
