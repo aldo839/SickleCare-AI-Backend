@@ -2,15 +2,13 @@ package com.sicklecare.api.controllers;
 
 import com.sicklecare.api.dtos.*;
 import com.sicklecare.api.exceptions.BadCredentialsException;
-import com.sicklecare.api.services.AuthService;
-import com.sicklecare.api.services.DoctorService;
-import com.sicklecare.api.services.OAuth2Service;
-import com.sicklecare.api.services.PatientService;
+import com.sicklecare.api.services.*;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
@@ -29,11 +27,29 @@ public class AuthController {
     private final PatientService patientService;
     private final DoctorService doctorService;
     private final OAuth2Service oAuth2Service;
+    private final LogoutService logoutService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginDTO){
 
         return ResponseEntity.ok(authService.authenticate(loginDTO));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
+
+        try {
+            logoutService.invalidateToken(authHeader);
+            SecurityContextHolder.clearContext();
+
+            return ResponseEntity.ok("Logout Successfully.");
+
+        } catch (Exception e) {
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error during logout process.");
+
+        }
     }
 
     @PostMapping("/register/patient")
