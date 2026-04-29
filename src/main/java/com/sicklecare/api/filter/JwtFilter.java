@@ -23,6 +23,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtils jwtUtils;
+    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -33,11 +34,19 @@ public class JwtFilter extends OncePerRequestFilter {
         String jwt = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")){
+
             jwt = authHeader.substring(7);
+
+            // Verify if the jwt is inside our jwt blacklist and stop the request;
+            if (redisTemplate.hasKey("blacklist:" + jwt)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return; // Stop the request
+            }
+
             try {
                 username = jwtUtils.extractUsername(jwt);
             } catch (ExpiredJwtException e) {
-//                System.out.println("JWT not valid : " + e.getMessage());
+                System.out.println("JWT not valid : " + e.getMessage());
             } catch (Exception e) {
                 System.out.println("Another JWT error : " + e.getMessage());
             }
@@ -56,4 +65,5 @@ public class JwtFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }
