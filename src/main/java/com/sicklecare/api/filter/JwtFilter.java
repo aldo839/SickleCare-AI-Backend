@@ -1,6 +1,7 @@
 package com.sicklecare.api.filter;
 
 import com.sicklecare.api.config.JwtUtils;
+import com.sicklecare.api.services.RateLimiterService;
 import com.sicklecare.api.services.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -24,6 +25,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtils jwtUtils;
     private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
+    private final RateLimiterService rateLimiterService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -32,6 +34,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String username = null;
         String jwt = null;
+
+        // Adding of rate limiting control
+        String clientIp = request.getRemoteAddr();
+
+        if (!rateLimiterService.isAllow(clientIp)){
+            response.setStatus(429);
+            response.getWriter().write("Too many requests. Retry later !");
+        }
 
         if (authHeader != null && authHeader.startsWith("Bearer ")){
 
