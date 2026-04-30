@@ -3,6 +3,7 @@ package com.sicklecare.api.services;
 import com.sicklecare.api.config.JwtUtils;
 import com.sicklecare.api.dtos.LoginRequestDTO;
 import com.sicklecare.api.dtos.LoginResponseDTO;
+import com.sicklecare.api.dtos.MfaVerificationRequestDTO;
 import com.sicklecare.api.exceptions.BadCredentialsException;
 import com.sicklecare.api.exceptions.ResourceNotFoundException;
 import com.sicklecare.api.models.Admin;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +22,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final MfaService mfaService;
 
     public LoginResponseDTO authenticate(LoginRequestDTO loginDTO) {
 
@@ -29,33 +30,49 @@ public class AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found !"));
 
         if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Bad password !");
+            throw new BadCredentialsException("Invalid email or password !");
         }
 
         if (!user.getActivated()) {
             throw new RuntimeException("Unactivated account. Please verify your mails.");
         }
 
-        String token = jwtUtils.generateToken(user);
-
-        // For patient
-        String firstname = null;
-        String lastname = null;
-
-        if (user instanceof Admin admin){
-            firstname = admin.getFirstname();
-            lastname = admin.getLastname();
-        } else if (user instanceof Doctor doctor){
-            firstname = doctor.getFirstname();
-            lastname = doctor.getLastname();
-        }
+        mfaService.generateAndSendCode(user.getEmail(), user.getUsername());
 
         return new LoginResponseDTO(
-                token,
+                null, // the token is null because authentication is not complete
                 user.getUsername(),
                 user.getRole().name(),
-                firstname,
-                lastname
+                null,
+                null,
+                true
         );
+
     }
+
+    public LoginResponseDTO verifyMfaGenerateToken(MfaVerificationRequestDTO request) {
+
+        if (mfaService.verifyCode(request)) {
+            User user = userRepository.findByEmail(request.email())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found !"));
+
+            String token = jwtUtils.generateToken(user);
+
+            // Fetch specifics information in user category.
+            String firstname = (user instanceof Admin admin) ? admin.getFirstname() : (user instanceof Doctor doctor) ? doctor.getFirstname() : null;
+            String lastname = (user instanceof Admin admin) ? admin.getLastname() : (user instanceof Doctor doctor) ? doctor.getLastname() : null;
+
+            return new LoginResponseDTO(
+                    token,
+                    user.getUsername(),
+                    user.getRole().name(),
+                    firstname,
+                    lastname,
+                    false // MFA is not required again because the user is already connected
+            );
+        }
+
+        throw new BadCredentialsException("Invalid or expired MFA code.");
+    }
+
 }
