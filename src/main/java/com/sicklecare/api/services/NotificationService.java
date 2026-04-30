@@ -17,6 +17,7 @@ public class NotificationService {
     private final JavaMailSender javaMailSender;
 
     public void sendActivationCode(Validation validation) {
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("noreply@sicklecareai.ai");
@@ -39,6 +40,7 @@ public class NotificationService {
 
     @Async
     public void sendAdminValidationSuccess(User user) {
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("noreply@sicklecareai.ai");
@@ -73,6 +75,30 @@ public class NotificationService {
 
         } catch (MailException e) {
             System.err.println("SMTP Error (Admin Validation): " + e.getMessage());
+        }
+    }
+
+    public void sendMfaCode(String email, String username, String code){
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("noreply@sicklecareai.ai");
+            message.setTo(email);
+            message.setSubject("Your activation code");
+            String text = String.format(
+                    "Hello %s, \n\nFor security reasons, please use the following code to complete your login: \n\n" +
+                    "CODE: %s \n\n" +
+                    "This code will expire in 5 minutes. If you did not request this, please secure your account.",
+                    username,
+                    code
+            );
+            message.setText(text);
+
+            javaMailSender.send(message);
+
+        } catch (MailException e) {
+            System.err.println("Error: " + e.getMessage());
+            System.out.println("MFA Mail Error: " + code);
         }
     }
 
