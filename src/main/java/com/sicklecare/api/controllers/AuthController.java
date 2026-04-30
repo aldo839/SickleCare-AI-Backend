@@ -1,5 +1,6 @@
 package com.sicklecare.api.controllers;
 
+import com.sicklecare.api.config.JwtUtils;
 import com.sicklecare.api.dtos.*;
 import com.sicklecare.api.exceptions.BadCredentialsException;
 import com.sicklecare.api.services.*;
@@ -7,8 +8,10 @@ import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
@@ -28,11 +31,34 @@ public class AuthController {
     private final DoctorService doctorService;
     private final OAuth2Service oAuth2Service;
     private final LogoutService logoutService;
+    private final MfaService mfaService;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final JwtUtils jwtUtils;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginDTO){
 
         return ResponseEntity.ok(authService.authenticate(loginDTO));
+    }
+
+    @PostMapping("/verify-mfa")
+    public ResponseEntity<?> verifyMfa(@RequestBody MfaVerificationRequestDTO request) {
+
+        if (mfaService.verifyCode(request)){
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
+            String jwt = jwtUtils.generateToken(userDetails);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("token", jwt);
+            response.put("type", "Bearer");
+
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Invalid or expired MFA code");
+
     }
 
     @PostMapping("/logout")
@@ -55,13 +81,17 @@ public class AuthController {
     @PostMapping("/register/patient")
     public ResponseEntity<PatientResponseDTO> registerPatient(@Valid @RequestBody PatientRegistrationDTO patientRegistrationDTO) throws MessagingException, UnsupportedEncodingException {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(patientService.registerPatient(patientRegistrationDTO));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(patientService.registerPatient(patientRegistrationDTO));
+
     }
 
     @PostMapping("/register/doctor")
     public ResponseEntity<DoctorResponseDTO> registerDoctor(@Valid @RequestBody DoctorRegistrationDTO doctorRegistrationDTO) throws MessagingException, UnsupportedEncodingException {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(doctorService.registerDoctor(doctorRegistrationDTO));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(doctorService.registerDoctor(doctorRegistrationDTO));
+
     }
 
     // Implementation of OAuth
@@ -82,14 +112,17 @@ public class AuthController {
                 Map<String, Object> response = new HashMap<>();
                 response.put("token", token);
                 return ResponseEntity.ok(response);
+
             } else {
                 throw new BadCredentialsException("Unsupported authentication type");
             }
 
         } catch (BadCredentialsException e) {
+
             Map<String, String> error = new HashMap<>();
             error.put("error", "Access Denial");
             error.put("message", "Authentication error. Please verify your access !");
+
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         }
     }
