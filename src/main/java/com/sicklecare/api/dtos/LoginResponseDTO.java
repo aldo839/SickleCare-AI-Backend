@@ -6,7 +6,8 @@ public record LoginResponseDTO(
         String username,
         String role,
         String firstname,
-        String lastname
+        String lastname,
+        Boolean mfaRequired
 
 ) {
 }
